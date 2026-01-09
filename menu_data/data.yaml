@@ -1,0 +1,8 @@
+ # Point to the folder created in Step 1
+path: ./yolo_dataset 
+train: train/images
+val: val/images
+
+# There is only 1 class: The red mark
+nc: 1
+names: ['marked_item']
