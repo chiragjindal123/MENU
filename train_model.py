@@ -9,7 +9,7 @@ except Exception as e:
 # --- SIMPLE TRAIN SCRIPT (edit constants below) ---
 WEIGHTS = "yolov8x.pt"    # default pretrained weights in this workspace
 DATA_YAML = "data.yaml"
-EPOCHS = 1
+EPOCHS = 100
 IMGSZ = 640
 BATCH = 16
 RUN_NAME = "menu_model"
