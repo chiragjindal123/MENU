@@ -7,8 +7,8 @@ except Exception as e:
     raise SystemExit("ultralytics is required. Install with: pip install ultralytics") from e
 
 # --- SIMPLE INFERENCE SCRIPT (edit constants below) ---
-INFER_WEIGHTS = "best.pt"          
-TEST_IMAGE = "C:\\Users\\wmlab\\Desktop\\MENU\\test_img\\images\\fixed_range_sample_1.jpg"  # example path in workspace
+INFER_WEIGHTS = "best_float32.tflite"          
+TEST_IMAGE = "C:\\Users\\wmlab\\Desktop\\MENU\\test_img\\images\\fixed_range_sample_2.jpg"  # example path in workspace
 OUTDIR = "runs/infer"
 IMGSZ = 1280
 CONF = 0.5
