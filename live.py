@@ -20,7 +20,8 @@ except Exception as e:
     raise SystemExit("ultralytics is required. Install with: pip install ultralytics") from e
 
 # --- OPTIMIZED CONFIGURATION FOR SPEED ---
-INFER_WEIGHTS = "best.pt"  # Use .pt instead of TFLite for better performance
+# INFER_WEIGHTS = "best.pt"  # Use .pt instead of TFLite for better performance
+INFER_WEIGHTS = "mixed_menu_model_best.pt"  # Use .pt instead of TFLite for better performance
 IMGSZ = 640  # REDUCED from 1280 - this is the KEY to speed!
 CONF = 0.5
 CAMERA_ID = 0
