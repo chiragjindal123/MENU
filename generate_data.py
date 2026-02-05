@@ -262,8 +262,8 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-INPUT_FOLDER = r"C:\Users\wmlab\Desktop\MENU\menu_data" 
-OUTPUT_DIR = "mixed_sign_dataset" 
+INPUT_FOLDER = "test_img_mixed"
+OUTPUT_DIR = "test_mixed_sign_dataset" 
 NUM_VARIATIONS_PER_MENU = 10 
 
 # --- DEFINE COLORS ---
