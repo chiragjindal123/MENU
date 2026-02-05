@@ -21,7 +21,7 @@ except Exception as e:
 
 # --- OPTIMIZED CONFIGURATION FOR SPEED ---
 INFER_WEIGHTS = "best.pt"  # Use .pt instead of TFLite for better performance
-IMGSZ = 320  # REDUCED from 1280 - this is the KEY to speed!
+IMGSZ = 640  # REDUCED from 1280 - this is the KEY to speed!
 CONF = 0.5
 CAMERA_ID = 0
 FPS_LIMIT = 30  # Increased target FPS
@@ -132,7 +132,7 @@ def run_camera_detection(weights=INFER_WEIGHTS,
             
             # Draw results
             if results and len(results) > 0:
-                annotated_frame = results[0].plot(font_size=4, line_width=3)
+                annotated_frame = results[0].plot(font_size=2, line_width=1)
                 
                 num_detections = 0
                 if hasattr(results[0], 'boxes') and len(results[0].boxes) > 0:
