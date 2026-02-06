@@ -9,7 +9,7 @@ except Exception as e:
 # INFER_WEIGHTS = "best_float32.tflite"          
 INFER_WEIGHTS = "mixed_menu_model_best.pt"          
 # TEST_IMAGE = "C:\\Users\\wmlab\\Desktop\\MENU\\test_img\\images\\fixed_range_sample_2.jpg"
-TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_7.jpg"
+TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_9.jpg"
 OUTDIR = "runs/infer"
 IMGSZ = 1280
 CONF = 0.5
