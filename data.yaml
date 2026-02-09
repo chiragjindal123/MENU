@@ -3,6 +3,5 @@ path: ./yolo_dataset
 train: train/images
 val: val/images
 
-# There is only 1 class: The red mark
-nc: 1
-names: ['marked_item']
+nc: 13  # number of classes
+names: ['marked_circle', 'marked_tick', 'marked_x', 'marked_number_1', 'marked_number_2', 'marked_number_3', 'marked_number_4', 'marked_number_5', 'marked_number_6', 'marked_number_7', 'marked_number_8', 'marked_number_9', 'marked_hollow']

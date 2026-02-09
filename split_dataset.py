@@ -4,8 +4,8 @@ import random
 import glob
 
 # --- CONFIGURATION ---
-SOURCE_DIR = "mixed_sign_dataset"  # Your existing folder
-DEST_DIR = "mixed_sign_yolo_dataset"            # New folder to be created
+SOURCE_DIR = "mixed_sign_classid_dataset"  # Your existing folder
+DEST_DIR = "mixed_sign_classid_yolo_dataset" # New folder to be created
 SPLIT_RATIO = 0.8                    # 80% Training, 20% Validation
 
 # 1. Create the YOLO folder structure

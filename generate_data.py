@@ -262,8 +262,8 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-INPUT_FOLDER = "test_img_mixed"
-OUTPUT_DIR = "test_mixed_sign_dataset" 
+INPUT_FOLDER = "menu_data"
+OUTPUT_DIR = "mixed_sign_classid_dataset" 
 NUM_VARIATIONS_PER_MENU = 10 
 
 # --- DEFINE COLORS ---
@@ -374,38 +374,43 @@ def draw_hollow_circle(img, box, color):
     return img
 
 def apply_random_mark(img, box):
-    """Apply a random mark type with random color"""
+    """Apply a random mark type with random color and return class ID"""
     # Choose random color
     color = random.choice(list(COLORS.values()))
     
     # Choose random mark type
     mark_types = [
-        ('circle', 0.30),      # 30% filled circle
-        ('tick', 0.25),        # 25% tick mark
-        ('x', 0.15),           # 15% X mark
-        ('number', 0.20),      # 20% numbers
-        ('hollow', 0.10),      # 10% hollow circle
+        ('circle', 0.30, 0),      # 30% filled circle, class 0
+        ('tick', 0.25, 1),        # 25% tick mark, class 1
+        ('x', 0.15, 2),           # 15% X mark, class 2
+        ('number', 0.20, None),   # 20% numbers, class 3-11
+        ('hollow', 0.10, 12),     # 10% hollow circle, class 12
     ]
     
     # Weighted random selection
-    mark_type = random.choices(
-        [m[0] for m in mark_types],
+    mark_type, _, class_id = random.choices(
+        mark_types,
         weights=[m[1] for m in mark_types]
     )[0]
     
     if mark_type == 'circle':
         draw_circle_mark(img, box, color)
+        return 0  # class 0
     elif mark_type == 'tick':
         draw_tick_mark(img, box, color)
+        return 1  # class 1
     elif mark_type == 'x':
         draw_x_mark(img, box, color)
+        return 2  # class 2
     elif mark_type == 'number':
         number = random.randint(1, 9)
         draw_number(img, box, color, number)
+        return 2 + number  # class 3-11 (for numbers 1-9)
     elif mark_type == 'hollow':
         draw_hollow_circle(img, box, color)
+        return 12  # class 12
     
-    return img
+    return 0  # default
 
 # --- MAIN GENERATOR LOOP ---
 image_files = glob.glob(os.path.join(INPUT_FOLDER, "*.jpg")) + \
@@ -457,8 +462,8 @@ for img_path in image_files:
         selected_boxes = random.sample(all_boxes, count_this_image)
         
         for box in selected_boxes:
-            # Apply random mark with random color
-            apply_random_mark(img_copy, box)
+            # Apply random mark with random color and get class ID
+            class_id = apply_random_mark(img_copy, box)
             
             pixel_x, pixel_y, pixel_w, pixel_h = box
             norm_cx = (pixel_x + pixel_w / 2) / w_img
@@ -466,7 +471,8 @@ for img_path in image_files:
             norm_w = pixel_w / w_img
             norm_h = pixel_h / h_img
             
-            new_labels.append(f"0 {norm_cx} {norm_cy} {norm_w} {norm_h}")
+            # Save with the correct class ID instead of always "0"
+            new_labels.append(f"{class_id} {norm_cx} {norm_cy} {norm_w} {norm_h}")
 
         save_name = f"{base_name}_sample_{i}"
         
