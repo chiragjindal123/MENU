@@ -4,4 +4,4 @@ train: train/images
 val: val/images
 
 nc: 13  # number of classes
-names: ['marked_circle', 'marked_tick', 'marked_x', 'marked_number_1', 'marked_number_2', 'marked_number_3', 'marked_number_4', 'marked_number_5', 'marked_number_6', 'marked_number_7', 'marked_number_8', 'marked_number_9', 'marked_hollow']
+names: ['marked_circle', 'marked_number_1', 'marked_number_2', 'marked_number_3', 'marked_number_4', 'marked_number_5', 'marked_number_6', 'marked_number_7', 'marked_number_8', 'marked_number_9', 'marked_tick', 'marked_x', 'marked_hollow']

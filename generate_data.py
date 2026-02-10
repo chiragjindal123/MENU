@@ -264,7 +264,7 @@ import glob
 # --- CONFIGURATION ---
 INPUT_FOLDER = "menu_data"
 OUTPUT_DIR = "mixed_sign_classid_dataset" 
-NUM_VARIATIONS_PER_MENU = 10 
+NUM_VARIATIONS_PER_MENU = 20 
 
 # --- DEFINE COLORS ---
 COLORS = {
@@ -380,10 +380,10 @@ def apply_random_mark(img, box):
     
     # Choose random mark type
     mark_types = [
-        ('circle', 0.30, 0),      # 30% filled circle, class 0
-        ('tick', 0.25, 1),        # 25% tick mark, class 1
-        ('x', 0.15, 2),           # 15% X mark, class 2
-        ('number', 0.20, None),   # 20% numbers, class 3-11
+        ('circle', 0.10, 0),      # 10% filled circle, class 0
+        ('number', 0.50, None),   # 50% numbers, class 1-9
+        ('tick', 0.15, 10),        # 15% tick mark, class 10
+        ('x', 0.15, 11),           # 15% X mark, class 11
         ('hollow', 0.10, 12),     # 10% hollow circle, class 12
     ]
     
@@ -396,16 +396,16 @@ def apply_random_mark(img, box):
     if mark_type == 'circle':
         draw_circle_mark(img, box, color)
         return 0  # class 0
-    elif mark_type == 'tick':
-        draw_tick_mark(img, box, color)
-        return 1  # class 1
-    elif mark_type == 'x':
-        draw_x_mark(img, box, color)
-        return 2  # class 2
     elif mark_type == 'number':
         number = random.randint(1, 9)
         draw_number(img, box, color, number)
-        return 2 + number  # class 3-11 (for numbers 1-9)
+        return number  # class 1-9 (for numbers 1-9)
+    elif mark_type == 'tick':
+        draw_tick_mark(img, box, color)
+        return 10  # class 10
+    elif mark_type == 'x':
+        draw_x_mark(img, box, color)
+        return 11  # class 11
     elif mark_type == 'hollow':
         draw_hollow_circle(img, box, color)
         return 12  # class 12
@@ -418,10 +418,10 @@ image_files = glob.glob(os.path.join(INPUT_FOLDER, "*.jpg")) + \
 
 print(f"Found {len(image_files)} source images in {INPUT_FOLDER}...")
 print("\nMark Types:")
-print("  - Filled circles (30%)")
-print("  - Tick marks ✓ (25%)")
+print("  - Filled circles (10%)")
+print("  - Tick marks ✓ (15%)")
 print("  - X marks ✗ (15%)")
-print("  - Numbers 1-9 (20%)")
+print("  - Numbers 1-9 (50%)")
 print("  - Hollow circles ○ (10%)")
 print("\nColors: Red, Light Red, Blue, Light Blue")
 print("-" * 50)
