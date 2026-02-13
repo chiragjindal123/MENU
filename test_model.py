@@ -114,14 +114,22 @@ def test_image(image_path=TEST_IMAGE,
                 
                 total_quantity += quantity
                 order_details[class_name] = order_details.get(class_name, 0) + quantity
-            
+                
             print("-" * 60)
             print(f"📊 ORDER SUMMARY:")
             print(f"Total Items Marked: {len(r.boxes)}")
             print(f"Total Quantity: {total_quantity}")
             print("\nBreakdown by Mark Type:")
             for mark_type, qty in sorted(order_details.items()):
-                print(f"  {mark_type}: {qty}")
+                count = sum(1 for box in r.boxes if r.names[int(box.cls[0])] == mark_type)
+                if 'number_' in mark_type:
+                    # Extract the number value from the mark type
+                    number_value = int(mark_type.split('_')[-1])
+                    print(f"  {mark_type}: {count} × {number_value} = {qty}")
+                else:
+                    # For non-number marks (circle, tick, x), each counts as 1
+                    print(f"  {mark_type}: {count} × 1 = {qty}")
+
 
 if __name__ == "__main__":
     test_image()
