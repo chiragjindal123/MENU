@@ -54,10 +54,10 @@ except Exception as e:
     raise SystemExit("ultralytics is required. Install with: pip install ultralytics") from e
 
 INFER_WEIGHTS = "multiclass_new.pt"          
-TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_2.jpg"
+TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_7.jpg"
 OUTDIR = "runs/infer"
 IMGSZ = 1280
-CONF = 0.5
+CONF = 0.6
 
 def extract_quantity(class_name):
     """Extract order quantity from detected mark"""
