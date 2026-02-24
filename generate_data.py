@@ -262,8 +262,8 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-INPUT_FOLDER = "menu_data"
-OUTPUT_DIR = "mixed_sign_classid_dataset" 
+INPUT_FOLDER = "test_images_make"
+OUTPUT_DIR = "test_image_handwritten_dataset" 
 NUM_VARIATIONS_PER_MENU = 20 
 
 # --- DEFINE COLORS ---
@@ -298,79 +298,157 @@ def read_yolo_labels(txt_path, img_width, img_height):
                 continue
     return boxes
 
-def draw_circle_mark(img, box, color):
-    """Draw a filled circle (current style)"""
+def draw_circle_mark(img, box, color, handwritten=False):
+    """Draw a filled circle (current style or handwritten)"""
     x, y, w, h = box
-    jitter = random.randint(-1, 1) 
+    jitter = random.randint(-2, 2) if handwritten else random.randint(-1, 1)
     center_x = x + w // 2 + jitter
     center_y = y + h // 2 + jitter
-    radius_x = int((w // 2) * random.uniform(0.85, 0.95))
-    radius_y = int((h // 2) * random.uniform(0.85, 0.95))
-    cv2.ellipse(img, (center_x, center_y), (radius_x, radius_y), 0, 0, 360, color, thickness=-1)
+    
+    if handwritten:
+        # Draw irregular handwritten circle using multiple curve segments
+        radius = int(min(w, h) * 0.4)
+        points = []
+        for angle in range(0, 360, 15):
+            rad = np.radians(angle)
+            r_variation = radius + random.randint(-2, 2)
+            px = int(center_x + r_variation * np.cos(rad))
+            py = int(center_y + r_variation * np.sin(rad))
+            points.append([px, py])
+        points = np.array(points, dtype=np.int32)
+        cv2.fillPoly(img, [points], color)
+    else:
+        radius_x = int((w // 2) * random.uniform(0.85, 0.95))
+        radius_y = int((h // 2) * random.uniform(0.85, 0.95))
+        cv2.ellipse(img, (center_x, center_y), (radius_x, radius_y), 0, 0, 360, color, thickness=-1)
     return img
 
-def draw_tick_mark(img, box, color):
+def draw_tick_mark(img, box, color, handwritten=False):
     """Draw a checkmark/tick ✓"""
     x, y, w, h = box
     center_x = x + w // 2
     center_y = y + h // 2
     
-    # Create tick coordinates
-    # Bottom point
-    pt1 = (int(center_x - w*0.3), int(center_y + h*0.1))
-    # Middle point (corner of tick)
-    pt2 = (int(center_x - w*0.1), int(center_y + h*0.3))
-    # Top point
-    pt3 = (int(center_x + w*0.3), int(center_y - h*0.3))
-    
-    thickness = max(1, int(w * 0.15))
-    cv2.line(img, pt1, pt2, color, thickness)
-    cv2.line(img, pt2, pt3, color, thickness)
+    if handwritten:
+        # Handwritten tick with slight curves and irregularity
+        pt1 = (int(center_x - w*0.3 + random.randint(-2, 2)), 
+               int(center_y + h*0.1 + random.randint(-2, 2)))
+        pt2 = (int(center_x - w*0.1 + random.randint(-1, 1)), 
+               int(center_y + h*0.3 + random.randint(-1, 1)))
+        pt3 = (int(center_x + w*0.3 + random.randint(-2, 2)), 
+               int(center_y - h*0.3 + random.randint(-2, 2)))
+        
+        # Ensure thickness is always at least 1
+        thickness = max(2, int(w * 0.12) + random.randint(-1, 1))
+        
+        # Draw with slight curve (using multiple segments)
+        mid1 = ((pt1[0] + pt2[0])//2, (pt1[1] + pt2[1])//2)
+        mid2 = ((pt2[0] + pt3[0])//2, (pt2[1] + pt3[1])//2)
+        
+        cv2.line(img, pt1, mid1, color, thickness)
+        cv2.line(img, mid1, pt2, color, thickness)
+        cv2.line(img, pt2, mid2, color, thickness)
+        cv2.line(img, mid2, pt3, color, thickness)
+    else:
+        pt1 = (int(center_x - w*0.3), int(center_y + h*0.1))
+        pt2 = (int(center_x - w*0.1), int(center_y + h*0.3))
+        pt3 = (int(center_x + w*0.3), int(center_y - h*0.3))
+        
+        thickness = max(2, int(w * 0.15))
+        cv2.line(img, pt1, pt2, color, thickness)
+        cv2.line(img, pt2, pt3, color, thickness)
     return img
 
-def draw_x_mark(img, box, color):
+def draw_x_mark(img, box, color, handwritten=False):
     """Draw an X mark"""
     x, y, w, h = box
-    thickness = max(1, int(w * 0.15))
+    thickness = max(2, int(w * 0.15))
     
-    # Draw X (two diagonal lines)
-    pt1 = (int(x + w*0.2), int(y + h*0.2))
-    pt2 = (int(x + w*0.8), int(y + h*0.8))
-    pt3 = (int(x + w*0.8), int(y + h*0.2))
-    pt4 = (int(x + w*0.2), int(y + h*0.8))
-    
-    cv2.line(img, pt1, pt2, color, thickness)
-    cv2.line(img, pt3, pt4, color, thickness)
+    if handwritten:
+        # Add irregularity to X mark
+        jitter = lambda: random.randint(-2, 2)
+        pt1 = (int(x + w*0.2) + jitter(), int(y + h*0.2) + jitter())
+        pt2 = (int(x + w*0.8) + jitter(), int(y + h*0.8) + jitter())
+        pt3 = (int(x + w*0.8) + jitter(), int(y + h*0.2) + jitter())
+        pt4 = (int(x + w*0.2) + jitter(), int(y + h*0.8) + jitter())
+        
+        thickness = max(2, thickness + random.randint(-1, 1))
+        
+        # Draw with multiple segments for irregular look
+        mid1 = ((pt1[0] + pt2[0])//2, (pt1[1] + pt2[1])//2)
+        mid2 = ((pt3[0] + pt4[0])//2, (pt3[1] + pt4[1])//2)
+        
+        cv2.line(img, pt1, mid1, color, thickness)
+        cv2.line(img, mid1, pt2, color, thickness)
+        cv2.line(img, pt3, mid2, color, thickness)
+        cv2.line(img, mid2, pt4, color, thickness)
+    else:
+        pt1 = (int(x + w*0.2), int(y + h*0.2))
+        pt2 = (int(x + w*0.8), int(y + h*0.8))
+        pt3 = (int(x + w*0.8), int(y + h*0.2))
+        pt4 = (int(x + w*0.2), int(y + h*0.8))
+        
+        cv2.line(img, pt1, pt2, color, thickness)
+        cv2.line(img, pt3, pt4, color, thickness)
     return img
 
-def draw_number(img, box, color, number):
+def draw_number(img, box, color, number, handwritten=False):
     """Draw a number (1-9)"""
     x, y, w, h = box
     center_x = x + w // 2
     center_y = y + h // 2
     
-    # Calculate font scale based on box size
     font_scale = w / 30.0
-    thickness = max(1, int(w * 0.1))
+    thickness = max(2, int(w * 0.1))
     
-    # Get text size to center it
+    if handwritten:
+        # Add slight rotation and position jitter for handwritten look
+        font_scale = font_scale * random.uniform(0.9, 1.1)
+        thickness = max(2, thickness + random.randint(-1, 1))
+        center_x += random.randint(-2, 2)
+        center_y += random.randint(-2, 2)
+        
+        # Use italic font for more handwritten feel
+        font = cv2.FONT_HERSHEY_SCRIPT_COMPLEX
+    else:
+        font = cv2.FONT_HERSHEY_SIMPLEX
+    
     text = str(number)
-    text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)[0]
+    text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
     text_x = center_x - text_size[0] // 2
     text_y = center_y + text_size[1] // 2
     
-    cv2.putText(img, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 
+    cv2.putText(img, text, (text_x, text_y), font, 
                 font_scale, color, thickness)
     return img
 
-def draw_hollow_circle(img, box, color):
+def draw_hollow_circle(img, box, color, handwritten=False):
     """Draw a hollow circle (outline only)"""
     x, y, w, h = box
     center_x = x + w // 2
     center_y = y + h // 2
     radius = int(min(w, h) * 0.4)
-    thickness = max(1, int(w * 0.1))
-    cv2.circle(img, (center_x, center_y), radius, color, thickness)
+    thickness = max(2, int(w * 0.1))
+    
+    if handwritten:
+        # Draw irregular handwritten circle outline
+        points = []
+        for angle in range(0, 360, 10):
+            rad = np.radians(angle)
+            r_variation = radius + random.randint(-2, 2)
+            px = int(center_x + r_variation * np.cos(rad))
+            py = int(center_y + r_variation * np.sin(rad))
+            points.append([px, py])
+        points = np.array(points, dtype=np.int32)
+        
+        # Draw connecting lines between points for irregular circle
+        for i in range(len(points)):
+            pt1 = tuple(points[i])
+            pt2 = tuple(points[(i + 1) % len(points)])
+            line_thickness = max(2, thickness + random.randint(-1, 1))
+            cv2.line(img, pt1, pt2, color, line_thickness)
+    else:
+        cv2.circle(img, (center_x, center_y), radius, color, thickness)
     return img
 
 def apply_random_mark(img, box):
@@ -378,12 +456,15 @@ def apply_random_mark(img, box):
     # Choose random color
     color = random.choice(list(COLORS.values()))
     
+    # 50% chance of handwritten style
+    handwritten = random.choice([True, False])
+    
     # Choose random mark type
     mark_types = [
         ('circle', 0.10, 0),      # 10% filled circle, class 0
-        ('number', 0.50, None),   # 50% numbers, class 1-9
-        ('tick', 0.15, 10),        # 15% tick mark, class 10
-        ('x', 0.15, 11),           # 15% X mark, class 11
+        ('number', 0.60, None),   # 50% numbers, class 1-9
+        ('tick', 0.10, 10),        # 15% tick mark, class 10
+        ('x', 0.10, 11),           # 15% X mark, class 11
         ('hollow', 0.10, 12),     # 10% hollow circle, class 12
     ]
     
@@ -394,20 +475,20 @@ def apply_random_mark(img, box):
     )[0]
     
     if mark_type == 'circle':
-        draw_circle_mark(img, box, color)
+        draw_circle_mark(img, box, color, handwritten)
         return 0  # class 0
     elif mark_type == 'number':
         number = random.randint(1, 9)
-        draw_number(img, box, color, number)
+        draw_number(img, box, color, number, handwritten)
         return number  # class 1-9 (for numbers 1-9)
     elif mark_type == 'tick':
-        draw_tick_mark(img, box, color)
+        draw_tick_mark(img, box, color, handwritten)
         return 10  # class 10
     elif mark_type == 'x':
-        draw_x_mark(img, box, color)
+        draw_x_mark(img, box, color, handwritten)
         return 11  # class 11
     elif mark_type == 'hollow':
-        draw_hollow_circle(img, box, color)
+        draw_hollow_circle(img, box, color, handwritten)
         return 12  # class 12
     
     return 0  # default
@@ -418,12 +499,13 @@ image_files = glob.glob(os.path.join(INPUT_FOLDER, "*.jpg")) + \
 
 print(f"Found {len(image_files)} source images in {INPUT_FOLDER}...")
 print("\nMark Types:")
-print("  - Filled circles (10%)")
-print("  - Tick marks ✓ (15%)")
-print("  - X marks ✗ (15%)")
-print("  - Numbers 1-9 (50%)")
-print("  - Hollow circles ○ (10%)")
+print("  - Filled circles (10%) - Regular + Handwritten")
+print("  - Tick marks ✓ (15%) - Regular + Handwritten")
+print("  - X marks ✗ (15%) - Regular + Handwritten")
+print("  - Numbers 1-9 (50%) - Regular + Handwritten")
+print("  - Hollow circles ○ (10%) - Regular + Handwritten")
 print("\nColors: Red, Light Red, Blue, Light Blue")
+print("Style: 50% Machine-like, 50% Handwritten")
 print("-" * 50)
 
 for img_path in image_files:

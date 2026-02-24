@@ -53,8 +53,9 @@ try:
 except Exception as e:
     raise SystemExit("ultralytics is required. Install with: pip install ultralytics") from e
 
-INFER_WEIGHTS = "multiclass_new.pt"          
-TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_7.jpg"
+INFER_WEIGHTS = "handwritten_best.pt"          
+# TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_7.jpg"
+TEST_IMAGE = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
 OUTDIR = "runs/infer"
 IMGSZ = 1280
 CONF = 0.6
