@@ -274,7 +274,7 @@ def main():
     if len(sys.argv) > 1:
         customer_image = sys.argv[1]
     else:
-        customer_image = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
+        customer_image = "test_image_handwritten_dataset/images/test_img_sample_4.jpg"
     
     # Check files exist
     if not Path(MODEL_PATH).exists():
