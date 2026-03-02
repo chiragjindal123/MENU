@@ -1,0 +1,98 @@
+{
+  "4": {
+    "m": {
+      "quantity": 5,
+      "marks": [
+        {
+          "type": "marked_number_5",
+          "confidence": 0.9382937550544739,
+          "iou": 0.48495009001213474
+        }
+      ]
+    }
+  },
+  "7": {
+    "s": {
+      "quantity": 6,
+      "marks": [
+        {
+          "type": "marked_number_6",
+          "confidence": 0.9360377192497253,
+          "iou": 0.7289403267958796
+        }
+      ]
+    }
+  },
+  "16": {
+    "m": {
+      "quantity": 1,
+      "marks": [
+        {
+          "type": "marked_tick",
+          "confidence": 0.93184494972229,
+          "iou": 0.7069031076066624
+        }
+      ]
+    }
+  },
+  "3": {
+    "m": {
+      "quantity": 1,
+      "marks": [
+        {
+          "type": "marked_number_1",
+          "confidence": 0.9212723970413208,
+          "iou": 0.45300513029944794
+        }
+      ]
+    }
+  },
+  "22": {
+    "m": {
+      "quantity": 2,
+      "marks": [
+        {
+          "type": "marked_number_2",
+          "confidence": 0.9130938649177551,
+          "iou": 0.7515835827110849
+        }
+      ]
+    }
+  },
+  "15": {
+    "s": {
+      "quantity": 1,
+      "marks": [
+        {
+          "type": "marked_tick",
+          "confidence": 0.8698198795318604,
+          "iou": 0.7294409322310761
+        }
+      ]
+    }
+  },
+  "8": {
+    "s": {
+      "quantity": 5,
+      "marks": [
+        {
+          "type": "marked_number_5",
+          "confidence": 0.8469336628913879,
+          "iou": 0.7409111671795229
+        }
+      ]
+    }
+  },
+  "11": {
+    "s": {
+      "quantity": 3,
+      "marks": [
+        {
+          "type": "marked_number_3",
+          "confidence": 0.8390963077545166,
+          "iou": 0.8066506447265996
+        }
+      ]
+    }
+  }
+}

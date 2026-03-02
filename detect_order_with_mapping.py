@@ -269,12 +269,12 @@ def main():
     
     # Configuration
     MODEL_PATH = "handwritten_best.pt"
-    MAPPING_PATH = "menu_mapping.json"
+    MAPPING_PATH = "menu_mapping_react.json"
     
     if len(sys.argv) > 1:
         customer_image = sys.argv[1]
     else:
-        customer_image = "test_image_handwritten_dataset/images/test_img_sample_4.jpg"
+        customer_image = "test_image_handwritten_dataset/images/test_img_sample_2.jpg"
     
     # Check files exist
     if not Path(MODEL_PATH).exists():
