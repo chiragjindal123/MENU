@@ -269,7 +269,7 @@ def main():
     
     # Configuration
     MODEL_PATH = "handwritten_best.pt"
-    MAPPING_PATH = "menu_mapping_react.json"
+    MAPPING_PATH = "menu_mapping.json"
     
     if len(sys.argv) > 1:
         customer_image = sys.argv[1]
