@@ -2,15 +2,15 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-DATASET_FOLDER = "mixed_sign_classid_handwritten_dataset"
+DATASET_FOLDER = "new_dataset_realistic_new"  # Change this to your dataset folder
 IMAGES_FOLDER = os.path.join(DATASET_FOLDER, "images")
 LABELS_FOLDER = os.path.join(DATASET_FOLDER, "labels")
 
-def rename_files_with_suffix(folder_path, extensions, suffix="_handwritten"):
+def rename_files_with_suffix(folder_path, extensions, suffix="_realistic"):
     """
     Rename all files in folder by adding suffix before extension
     
-    Example: file.jpg -> file_handwritten.jpg
+    Example: file.jpg -> file_realistic.jpg
     """
     if not os.path.exists(folder_path):
         print(f"Error: Folder not found: {folder_path}")
@@ -48,7 +48,7 @@ def rename_files_with_suffix(folder_path, extensions, suffix="_handwritten"):
 
 # --- MAIN EXECUTION ---
 print("=" * 60)
-print("RENAMING FILES - Adding '_handwritten' suffix")
+print("RENAMING FILES - Adding '_realistic' suffix")
 print("=" * 60)
 
 # Rename images
