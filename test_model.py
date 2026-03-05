@@ -47,15 +47,18 @@
 
 
 from pathlib import Path
+import cv2
 
 try:
     from ultralytics import YOLO
 except Exception as e:
     raise SystemExit("ultralytics is required. Install with: pip install ultralytics") from e
 
-INFER_WEIGHTS = "handwritten_best.pt"          
+# INFER_WEIGHTS = "handwritten_best.pt"          
+INFER_WEIGHTS = "realistic_best.pt"          
 # TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_7.jpg"
-TEST_IMAGE = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
+# TEST_IMAGE = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
+TEST_IMAGE = "test_prof_img\\images\\imgg_sample_14.jpg"
 OUTDIR = "runs/infer"
 IMGSZ = 1280
 CONF = 0.6
@@ -83,17 +86,33 @@ def test_image(image_path=TEST_IMAGE,
     order_details = {}
 
     for i, r in enumerate(results):
-        plotted = r.plot(font_size=5, line_width=4)
+        # Get actual image dimensions
+        img_height, img_width = r.orig_img.shape[:2]
+        
+        # Calculate proportional font size and line width based on image size
+        # Smaller values for larger images
+        base_size = min(img_width, img_height)
+        font_size = max(0.3, base_size / 2000)      # Auto-scale font
+        line_width = max(1, int(base_size / 800))   # Auto-scale line width
+        
+        # Plot with scaled parameters
+        plotted = r.plot(
+            font_size=font_size,
+            line_width=line_width,
+            labels=True,
+            conf=True
+        )
+        
         img_out = out_dir / f"inference_{i}.jpg"
 
         try:
-            import cv2
             cv2.imwrite(str(img_out), plotted)
         except Exception:
             from PIL import Image
             Image.fromarray(plotted[:, :, ::-1]).save(img_out)
         
         print(f"Saved: {img_out}")
+        print(f"Image size: {img_width}x{img_height}, Font: {font_size:.2f}, Line: {line_width}")
         
         if hasattr(r, "boxes") and len(r.boxes) > 0:
             print(f"\n📋 Detected {len(r.boxes)} marked items:")

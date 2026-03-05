@@ -262,8 +262,8 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-INPUT_FOLDER = "menu_data"
-OUTPUT_DIR = "new_dataset_realistic_new" 
+INPUT_FOLDER = "prof_img"
+OUTPUT_DIR = "test_prof_img" 
 NUM_VARIATIONS_PER_MENU = 20 
 
 # --- REALISTIC PEN COLORS (BGR FORMAT) ---
