@@ -4,3 +4,4 @@ mixed_menu_model_best.pt
 menu_model_multiclass.pt
 multiclass_new.pt
 *.pt
+*.zip
