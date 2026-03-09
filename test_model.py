@@ -56,10 +56,11 @@ except Exception as e:
 
 # INFER_WEIGHTS = "handwritten_best.pt"          
 INFER_WEIGHTS = "realistic_best.pt"          
-# TEST_IMAGE = "test_mixed_sign_dataset/images/test_img_sample_7.jpg"
+# TEST_IMAGE = "test_img_realistic/images/test_img_sample_11.jpg"
 # TEST_IMAGE = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
-TEST_IMAGE = "test_prof_img\\images\\imgg_sample_14.jpg"
-OUTDIR = "runs/infer"
+TEST_IMAGE = "prof_test_img/images/imgg_sample_2.jpg"
+# OUTDIR = "runs/infer"
+OUTDIR = "runs/prof"
 IMGSZ = 1280
 CONF = 0.6
 

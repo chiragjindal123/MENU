@@ -263,7 +263,7 @@ import glob
 
 # --- CONFIGURATION ---
 INPUT_FOLDER = "prof_img"
-OUTPUT_DIR = "test_prof_img" 
+OUTPUT_DIR = "prof_test_img" 
 NUM_VARIATIONS_PER_MENU = 20 
 
 # --- REALISTIC PEN COLORS (BGR FORMAT) ---

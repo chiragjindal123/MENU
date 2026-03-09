@@ -79,7 +79,7 @@ class OrderDetector:
                              self.template_size['height']))
         return resized
     
-    def detect_marks(self, image, conf=0.55):
+    def detect_marks(self, image, conf=0.45):
         """Run YOLO detection on image"""
         results = self.model(image, imgsz=1280, conf=conf, verbose=False)
         
@@ -100,7 +100,7 @@ class OrderDetector:
         
         return detections
     
-    def match_with_mapping(self, detections, iou_threshold=0.3):
+    def match_with_mapping(self, detections, iou_threshold=0.15):
         """Match detections with menu mapping using IOU"""
         order = {}
         unmatched_detections = []
