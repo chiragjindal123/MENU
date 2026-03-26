@@ -1,5 +1,9 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const NGROK_HEADERS = {
+  'ngrok-skip-browser-warning': 'true',
+};
+
 export class MenuAPI {
   /**
    * Detect order from filled menu image
@@ -13,6 +17,7 @@ export class MenuAPI {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...NGROK_HEADERS,
         },
         body: JSON.stringify({
           image: imageBase64,
@@ -37,7 +42,11 @@ export class MenuAPI {
    */
   static async healthCheck() {
     try {
-      const response = await fetch(`${API_BASE_URL}/`);
+      const response = await fetch(`${API_BASE_URL}/`, {
+        headers: {
+          ...NGROK_HEADERS,
+        },
+      });
       return response.ok;
     } catch {
       return false;
