@@ -260,11 +260,17 @@ import numpy as np
 import random
 import os
 import glob
+import math
 
 # --- CONFIGURATION ---
-INPUT_FOLDER = "prof_img"
-OUTPUT_DIR = "prof_test_img" 
-NUM_VARIATIONS_PER_MENU = 20 
+INPUT_FOLDER = "menu_data"
+OUTPUT_DIR = "overlap_img" 
+NUM_VARIATIONS_PER_MENU = 40 
+
+OVERLAP_PROB = 0.65          # how often mark is shifted toward border
+EDGE_TOUCH_PROB = 0.45       # how often mark explicitly touches border
+MAX_JITTER_FRACTION = 0.28   # center jitter as fraction of box size
+MARK_SCALE_RANGE = (0.85, 1.25)
 
 # --- REALISTIC PEN COLORS (BGR FORMAT) ---
 COLORS = {
@@ -501,43 +507,109 @@ def draw_handwritten_hollow_circle(img, box, color):
     
     return img
 
+def _clamp(v, lo, hi):
+    return max(lo, min(hi, v))
+
+def make_overlap_box(box, img_w, img_h):
+    """
+    Returns a modified drawing box (for rendering only) so marks can overlap
+    checkbox border / be imperfect. Label box remains original checkbox box.
+    """
+    x, y, w, h = box
+    cx = x + w / 2
+    cy = y + h / 2
+
+    # Random scale for imperfect size
+    s = random.uniform(*MARK_SCALE_RANGE)
+    nw = max(6, int(w * s))
+    nh = max(6, int(h * s))
+
+    # Shift center (stronger shift for overlap samples)
+    jf = MAX_JITTER_FRACTION if random.random() < OVERLAP_PROB else 0.12
+    dx = random.uniform(-jf, jf) * w
+    dy = random.uniform(-jf, jf) * h
+
+    # Optional edge-bias: push mark near one border
+    if random.random() < EDGE_TOUCH_PROB:
+      side = random.choice(["left", "right", "top", "bottom"])
+      if side == "left":
+          dx -= 0.22 * w
+      elif side == "right":
+          dx += 0.22 * w
+      elif side == "top":
+          dy -= 0.22 * h
+      else:
+          dy += 0.22 * h
+
+    ncx = cx + dx
+    ncy = cy + dy
+
+    nx = int(ncx - nw / 2)
+    ny = int(ncy - nh / 2)
+
+    # keep inside image
+    nx = _clamp(nx, 0, img_w - nw - 1)
+    ny = _clamp(ny, 0, img_h - nh - 1)
+
+    return [nx, ny, nw, nh]
+
+def draw_border_scribble(img, box, color):
+    """Extra artifact touching checkbox border."""
+    x, y, w, h = box
+    side = random.choice(["left", "right", "top", "bottom"])
+    if side in ("left", "right"):
+        xx = x if side == "left" else x + w
+        y1 = int(y + random.uniform(0.15, 0.85) * h)
+        y2 = int(y1 + random.uniform(-0.25, 0.25) * h)
+        cv2.line(img, (xx, y1), (xx + random.randint(-3, 3), y2), color, random.randint(1, 3))
+    else:
+        yy = y if side == "top" else y + h
+        x1 = int(x + random.uniform(0.15, 0.85) * w)
+        x2 = int(x1 + random.uniform(-0.25, 0.25) * w)
+        cv2.line(img, (x1, yy), (x2, yy + random.randint(-3, 3)), color, random.randint(1, 3))
+
 def apply_random_mark(img, box):
-    """Apply handwritten mark with realistic pen color"""
+    """Apply handwritten mark with realistic pen color + overlap variants."""
     color = get_random_pen_color()
-    
-    # Mark distribution - focus on numbers
+    img_h, img_w = img.shape[:2]
+
+    # draw box can be shifted/scaled for overlap training
+    draw_box = make_overlap_box(box, img_w, img_h)
+
     mark_types = [
-        ('circle', 0.25, 0),
-        ('number', 0.45, None),   # 60% numbers
-        ('tick', 0.20, 10),
-        ('x', 0.05, 11),
+        ('circle', 0.30, 0),
+        ('number', 0.20, None),
+        ('tick',   0.35, 10),
+        ('x',      0.10, 11),
         ('hollow', 0.05, 12),
     ]
     
     mark_type, _, class_id = random.choices(
-        mark_types,
-        weights=[m[1] for m in mark_types]
+        mark_types, weights=[m[1] for m in mark_types]
     )[0]
-    
-    # All marks are handwritten but recognizable
+
     if mark_type == 'circle':
-        draw_handwritten_circle(img, box, color)
-        return 0
+        draw_handwritten_circle(img, draw_box, color)
+        out = 0
     elif mark_type == 'number':
         number = random.randint(1, 9)
-        draw_handwritten_number(img, box, color, number)
-        return number
+        draw_handwritten_number(img, draw_box, color, number)
+        out = number
     elif mark_type == 'tick':
-        draw_handwritten_tick(img, box, color)
-        return 10
+        draw_handwritten_tick(img, draw_box, color)
+        out = 10
     elif mark_type == 'x':
-        draw_handwritten_x(img, box, color)
-        return 11
-    elif mark_type == 'hollow':
-        draw_handwritten_hollow_circle(img, box, color)
-        return 12
-    
-    return 0
+        draw_handwritten_x(img, draw_box, color)
+        out = 11
+    else:
+        draw_handwritten_hollow_circle(img, draw_box, color)
+        out = 12
+
+    # extra border artifact sometimes
+    if random.random() < 0.30:
+        draw_border_scribble(img, box, color)
+
+    return out
 
 # --- MAIN GENERATOR LOOP ---
 image_files = glob.glob(os.path.join(INPUT_FOLDER, "*.jpg")) + \

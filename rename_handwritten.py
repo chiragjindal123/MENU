@@ -2,11 +2,11 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-DATASET_FOLDER = "new_dataset_realistic_new"  # Change this to your dataset folder
+DATASET_FOLDER = "overlap_img"  # Change this to your dataset folder
 IMAGES_FOLDER = os.path.join(DATASET_FOLDER, "images")
 LABELS_FOLDER = os.path.join(DATASET_FOLDER, "labels")
 
-def rename_files_with_suffix(folder_path, extensions, suffix="_realistic"):
+def rename_files_with_suffix(folder_path, extensions, suffix="_overlap"):
     """
     Rename all files in folder by adding suffix before extension
     
