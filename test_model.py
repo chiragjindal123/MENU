@@ -62,10 +62,11 @@ INFER_WEIGHTS = "1024img_best.pt"
 # TEST_IMAGE = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
 # TEST_IMAGE = "prof_test_img/images/imgg_sample_9.jpg"
 # TEST_IMAGE = "test_images_make/test1_New.jpg"
-TEST_IMAGE = "prof_img/test.png"
+TEST_IMAGE = "test_images_make/chaos_img.jpg"
+# TEST_IMAGE = "prof_img/test.png"
 # OUTDIR = "runs/infer"
 OUTDIR = "runs/prof"
-IMGSZ = 640
+IMGSZ = 320
 CONF = 0.35
 
 def extract_quantity(class_name):

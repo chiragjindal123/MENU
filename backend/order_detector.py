@@ -24,6 +24,8 @@ class OrderDetector:
             'height': mapping_data['image_info']['height']
         }
         self.menu_mapping = mapping_data['menu_mapping']
+        self.match_near_px = 18      # consider marks near checkbox as valid
+        self.model_imgsz = 1280       # more stable for your current model
         
         print(f"📋 Loaded mapping with {len(self.menu_mapping)} items")
         
@@ -79,10 +81,12 @@ class OrderDetector:
                              self.template_size['height']))
         return resized
     
-    def detect_marks(self, image, conf=0.45):
-        """Run YOLO detection on image"""
-        results = self.model(image, imgsz=1280, conf=conf, verbose=False)
-        
+    def detect_marks(self, image, conf=0.35, imgsz=None):
+        """Run YOLO detection on image."""
+        if imgsz is None:
+            imgsz = self.model_imgsz
+        results = self.model(image, imgsz=imgsz, conf=conf, verbose=False)
+
         detections = []
         for r in results:
             if hasattr(r, 'boxes') and len(r.boxes) > 0:
@@ -100,27 +104,69 @@ class OrderDetector:
         
         return detections
     
-    def match_with_mapping(self, detections, iou_threshold=0.15):
-        """Match detections with menu mapping using IOU"""
+    def _expand_box(self, box, pad_x, pad_y):
+        """Expand YOLO box by normalized padding."""
+        cx, cy, w, h = box
+        return [cx, cy, min(1.0, w + 2 * pad_x), min(1.0, h + 2 * pad_y)]
+
+    def _point_in_box(self, point, box):
+        """Check if normalized point is inside YOLO box."""
+        px, py = point
+        cx, cy, w, h = box
+        x1, y1 = cx - w / 2, cy - h / 2
+        x2, y2 = cx + w / 2, cy + h / 2
+        return x1 <= px <= x2 and y1 <= py <= y2
+
+    def _center_distance_ratio(self, point, box):
+        """
+        Distance from point to checkbox center, normalized by checkbox diagonal.
+        <= 1 means within ~one checkbox diagonal.
+        """
+        px, py = point
+        cx, cy, w, h = box
+        diag = max(np.sqrt(w * w + h * h), 1e-6)
+        dist = np.sqrt((px - cx) ** 2 + (py - cy) ** 2)
+        return dist / diag    
+
+    def match_with_mapping(self, detections, iou_threshold=0.05):
+        """Match detections with checkbox mapping using overlap OR touch/near logic."""
         order = {}
         unmatched_detections = []
-        
+
+        pad_x = self.match_near_px / self.template_size['width']
+        pad_y = self.match_near_px / self.template_size['height']
+
         for detection in detections:
             det_box = detection['bbox']
+            det_center = (det_box[0], det_box[1])
             mark_class = detection['class']
             quantity = self.extract_quantity(mark_class)
             confidence = detection['confidence']
-            
+
             best_match = None
-            best_iou = iou_threshold
-            
+            best_score = -1.0
+
             for item_name, item_data in self.menu_mapping.items():
                 for checkbox in item_data['checkboxes']:
                     cb_box = checkbox['bbox']
+
                     iou = self.calculate_iou(det_box, cb_box)
-                    
-                    if iou > best_iou:
-                        best_iou = iou
+                    expanded_cb = self._expand_box(cb_box, pad_x, pad_y)
+                    iou_near = self.calculate_iou(det_box, expanded_cb)
+                    center_in_near = self._point_in_box(det_center, expanded_cb)
+                    dist_ratio = self._center_distance_ratio(det_center, cb_box)
+                    near_by_distance = dist_ratio <= 1.05
+
+                    # score prefers true overlap, but also accepts touch/near
+                    score = max(iou, iou_near * 0.9)
+                    if center_in_near:
+                        score = max(score, 0.12)
+                    if near_by_distance:
+                        score += max(0.0, (1.05 - dist_ratio)) * 0.05
+
+                    is_valid = (iou >= iou_threshold) or center_in_near or near_by_distance
+                    if is_valid and score > best_score:
+                        best_score = score
                         best_match = {
                             'item': item_name,
                             'option': checkbox['option'],
@@ -128,33 +174,29 @@ class OrderDetector:
                             'confidence': confidence,
                             'iou': iou
                         }
-            
+
             if best_match:
                 item = best_match['item']
                 option = best_match['option']
                 qty = best_match['quantity']
-                
+
                 if item not in order:
                     order[item] = {}
-                
                 if option not in order[item]:
-                    order[item][option] = {
-                        'quantity': 0,
-                        'marks': []
-                    }
-                
+                    order[item][option] = {'quantity': 0, 'marks': []}
+
                 order[item][option]['quantity'] += qty
                 order[item][option]['marks'].append({
                     'type': mark_class,
                     'confidence': confidence,
-                    'iou': best_iou
+                    'iou': best_match['iou']
                 })
             else:
                 unmatched_detections.append({
                     'mark': mark_class,
                     'confidence': confidence
                 })
-        
+
         return order, unmatched_detections
     
     def process_order(self, customer_image):

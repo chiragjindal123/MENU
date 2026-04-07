@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # Model path (adjust as needed)
-MODEL_PATH = Path(__file__).parent.parent / "best_heavy.pt"
+MODEL_PATH = Path(__file__).parent.parent / "1024img_best.pt"
 
 class OrderDetectionRequest(BaseModel):
     """Request model for order detection"""
