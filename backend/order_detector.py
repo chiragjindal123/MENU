@@ -81,7 +81,7 @@ class OrderDetector:
                              self.template_size['height']))
         return resized
     
-    def detect_marks(self, image, conf=0.35, imgsz=None):
+    def detect_marks(self, image, conf=0.40, imgsz=None):
         """Run YOLO detection on image."""
         if imgsz is None:
             imgsz = self.model_imgsz

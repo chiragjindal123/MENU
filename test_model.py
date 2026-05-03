@@ -58,17 +58,18 @@ except Exception as e:
 # INFER_WEIGHTS = "realistic_best.pt"          
 # INFER_WEIGHTS = "best_heavy.pt"          
 # INFER_WEIGHTS = "1024img_best.pt"          
-INFER_WEIGHTS = "complex_best.pt"          
+# INFER_WEIGHTS = "complex_best.pt"          
+INFER_WEIGHTS = "complex_best_2.pt"          
 # TEST_IMAGE = "test_img_realistic/images/test_img_sample_11.jpg"
 # TEST_IMAGE = "test_image_handwritten_dataset/images/test_img_sample_19.jpg"
-# TEST_IMAGE = "prof_test_img/images/imgg_sample_2.jpg"
+TEST_IMAGE = "prof_test_img/images/imgg_sample_2.jpg"
 # TEST_IMAGE = "test_images_make/test1_New.jpg"
-TEST_IMAGE = "test_images_make/chaos_img.jpg"
+# TEST_IMAGE = "test_images_make/chaos_img.jpg"
 # TEST_IMAGE = "prof_img/test.png"
 # OUTDIR = "runs/infer"
 OUTDIR = "runs/chaos"
 IMGSZ = 1280
-CONF = 0.35
+CONF = 0.55
 
 def extract_quantity(class_name):
     """Extract order quantity from detected mark"""

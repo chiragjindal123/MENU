@@ -4,8 +4,8 @@ import random
 import glob
 
 # --- CONFIGURATION ---
-SOURCE_DIR = "tuff_img"  # Your existing folder
-DEST_DIR = "tuff_img_yolo_dataset" # New folder to be created
+SOURCE_DIR = "complex_img"  # Your existing folder
+DEST_DIR = "complex_img_yolo_dataset" # New folder to be created
 SPLIT_RATIO = 0.8                    # 80% Training, 20% Validation
 
 # 1. Create the YOLO folder structure
@@ -49,4 +49,4 @@ def copy_data(image_list, split_type):
 copy_data(train_imgs, "train")
 copy_data(val_imgs, "val")
 
-print("Done! Your data is ready in the 'tuff_img_yolo_dataset' folder.")
+print("Done! Your data is ready in the 'complex_img_yolo_dataset' folder.")

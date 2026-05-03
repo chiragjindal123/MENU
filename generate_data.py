@@ -263,8 +263,8 @@ import glob
 import math
 
 # --- CONFIGURATION ---
-INPUT_FOLDER = "tuff"
-OUTPUT_DIR = "tuff_img" 
+INPUT_FOLDER = "complex"
+OUTPUT_DIR = "complex_img" 
 NUM_VARIATIONS_PER_MENU = 40 
 
 OVERLAP_PROB = 0.65          # how often mark is shifted toward border
