@@ -42,13 +42,20 @@ export class MenuAPI {
    */
   static async healthCheck() {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       const response = await fetch(`${API_BASE_URL}/`, {
         headers: {
           ...NGROK_HEADERS,
         },
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       return response.ok;
-    } catch {
+    } catch (err) {
+      console.error('Health check error:', err);
       return false;
     }
   }
